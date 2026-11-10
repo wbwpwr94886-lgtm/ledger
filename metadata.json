@@ -1,0 +1,6 @@
+{
+  "name": "Ledger ليدجر",
+  "description": "تطبيق ليدجر Ledger المحاسبي المتكامل لإدارة الحسابات، الديون، الموردين، المخزون، صرفيات المولدات والفواتير",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
