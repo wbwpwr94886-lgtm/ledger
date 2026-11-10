@@ -1,0 +1,26 @@
+{
+  "entities": {
+    "User": {
+      "collection": "users",
+      "fields": {
+        "userId": { "type": "string", "required": true },
+        "email": { "type": "string", "required": false },
+        "displayName": { "type": "string", "required": false },
+        "createdAt": { "type": "timestamp", "required": false }
+      }
+    },
+    "CloudBackup": {
+      "collection": "users/{userId}/backups",
+      "fields": {
+        "userId": { "type": "string", "required": true },
+        "backupData": { "type": "string", "required": true },
+        "accountsCount": { "type": "number", "required": true },
+        "productsCount": { "type": "number", "required": true },
+        "debtsCount": { "type": "number", "required": true },
+        "invoicesCount": { "type": "number", "required": true },
+        "createdAt": { "type": "timestamp", "required": false },
+        "updatedAt": { "type": "timestamp", "required": false }
+      }
+    }
+  }
+}

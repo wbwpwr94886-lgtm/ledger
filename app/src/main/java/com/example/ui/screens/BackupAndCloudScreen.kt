@@ -579,9 +579,11 @@ fun BackupAndCloudScreen(
                     Button(
                         onClick = {
                             isCloudSyncing = true
-                            BackupExportHelper.performCloudBackup(context) { success: Boolean, msg: String ->
+                            viewModel.syncCurrentDatabaseToFirestore(context) { success: Boolean, msg: String ->
                                 isCloudSyncing = false
-                                lastSyncTime = "الآن بنجاح ✓"
+                                if (success) {
+                                    lastSyncTime = "الآن بنجاح ✓ (Firebase)"
+                                }
                                 Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
                             }
                         },
@@ -596,7 +598,26 @@ fun BackupAndCloudScreen(
                             Icon(Icons.Default.CloudUpload, contentDescription = null)
                             Spacer(modifier = Modifier.width(8.dp))
                         }
-                        Text(if (isAr) "مزامنة ونسخ سحابي فوري الآن" else "Sync to Cloud Now")
+                        Text(if (isAr) "مزامنة ونسخ سحابي فوري عبر Firebase" else "Sync to Firebase Cloud Now")
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Restore from Firebase Cloud
+                    OutlinedButton(
+                        onClick = {
+                            isCloudSyncing = true
+                            viewModel.restoreLatestBackupFromFirestore(context) { success: Boolean, msg: String ->
+                                isCloudSyncing = false
+                                Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Icon(Icons.Default.CloudDownload, contentDescription = null, tint = BlueInfo)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(if (isAr) "استعادة أحدث نسخة من Firebase Cloud" else "Restore from Firebase Cloud")
                     }
 
                     Spacer(modifier = Modifier.height(14.dp))

@@ -1,0 +1,14 @@
+{
+  "firestore": {
+    "database": "ai-studio-android-ledger-8087ba9f-3efa-4cd9-a59f-0d1acbfbfe0f",
+    "rules": "firestore.rules"
+  },
+  "emulators": {
+    "auth": {
+      "port": 9099
+    },
+    "firestore": {
+      "port": 8085
+    }
+  }
+}

@@ -673,4 +673,65 @@ class AccountingViewModel(application: Application) : AndroidViewModel(applicati
             refreshLocalBackups(context)
         }
     }
+
+    /**
+     * Firebase Cloud Firestore Backup & Sync Methods
+     */
+    fun syncCurrentDatabaseToFirestore(
+        context: Context,
+        onComplete: (success: Boolean, message: String) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val cloudRepo = com.example.data.repository.FirestoreCloudRepository(context)
+                val fullPayload = withContext(Dispatchers.IO) {
+                    repository.exportAllDataToJson()
+                }
+
+                val docId = withContext(Dispatchers.IO) {
+                    cloudRepo.uploadBackupToFirestore(
+                        jsonBackup = fullPayload,
+                        accountsCount = accounts.value.size,
+                        productsCount = products.value.size,
+                        debtsCount = debts.value.size,
+                        invoicesCount = invoices.value.size
+                    )
+                }
+                onComplete(true, "تم حفظ ومزامنة قاعدة البيانات بنجاح في Firebase Cloud Firestore (Doc: ${docId.take(8)})")
+            } catch (e: Exception) {
+                onComplete(false, "فشلت المزامنة السحابية: ${e.localizedMessage}")
+            }
+        }
+    }
+
+    fun restoreLatestBackupFromFirestore(
+        context: Context,
+        onComplete: (success: Boolean, message: String) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val cloudRepo = com.example.data.repository.FirestoreCloudRepository(context)
+                val rawJson = withContext(Dispatchers.IO) {
+                    cloudRepo.getLatestBackupFromFirestore()
+                }
+                if (rawJson == null) {
+                    onComplete(false, "لم يتم العثور على أي نسخة احتياطية سحابية محفوظة في حسابك.")
+                    return@launch
+                }
+
+                val payload = withContext(Dispatchers.IO) {
+                    JsonBackupManager.parseBackupJson(rawJson)
+                }
+
+                withContext(Dispatchers.IO) {
+                    repository.restoreDataFromJson(payload, wipeBeforeRestore = true)
+                }
+
+                refreshLocalBackups(context)
+                onComplete(true, "تمت استعادة البيانات السحابية بنجاح من Firebase Cloud Firestore!")
+            } catch (e: Exception) {
+                onComplete(false, "حدث خطأ أثناء استعادة البيانات من السحابة: ${e.localizedMessage}")
+            }
+        }
+    }
 }
